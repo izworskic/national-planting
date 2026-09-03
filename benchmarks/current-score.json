@@ -1,28 +1,30 @@
 {
-  "version": "1.2.0",
+  "version": "1.3.0",
   "updated": "2026-09-03",
-  "benchmarkVersion": "2.2.0",
+  "benchmarkVersion": "2.3.0",
   "status": "pre-release-implementation-score",
   "valueRatings": [
     {"id":"horticultural-correctness","weight":13,"rating":95,"weightedPoints":12.35},
     {"id":"plant-today-runway","weight":12,"rating":98,"weightedPoints":11.76},
-    {"id":"succession-relay","weight":10,"rating":97,"weightedPoints":9.7},
+    {"id":"succession-relay","weight":10,"rating":97,"weightedPoints":9.70},
     {"id":"fall-cold-tolerance","weight":8,"rating":96,"weightedPoints":7.68},
     {"id":"crop-lifecycle","weight":7,"rating":96,"weightedPoints":6.72},
     {"id":"local-climate","weight":7,"rating":95,"weightedPoints":6.65},
     {"id":"soil-heat-gating","weight":7,"rating":97,"weightedPoints":6.79},
     {"id":"season-extension","weight":7,"rating":96,"weightedPoints":6.72},
-    {"id":"forward-planning","weight":8,"rating":95,"weightedPoints":7.6},
-    {"id":"cultivar-harvest-variability","weight":6,"rating":96,"weightedPoints":5.76},
+    {"id":"forward-planning","weight":8,"rating":95,"weightedPoints":7.60},
+    {"id":"cultivar-harvest-variability","weight":6,"rating":99,"weightedPoints":5.94},
     {"id":"hot-climate-edge-cases","weight":6,"rating":92,"weightedPoints":5.52},
-    {"id":"uncertainty-provenance","weight":5,"rating":96,"weightedPoints":4.8},
-    {"id":"actionability-ux","weight":3,"rating":98,"weightedPoints":2.94},
+    {"id":"uncertainty-provenance","weight":5,"rating":97,"weightedPoints":4.85},
+    {"id":"actionability-ux","weight":3,"rating":99,"weightedPoints":2.97},
     {"id":"source-maintainability","weight":1,"rating":97,"weightedPoints":0.97}
   ],
   "triggeredLosses": [],
   "scenarioTests": {
     "automated": [
       "90-day exact-runway tender crop",
+      "fast-vs-slow seed-packet cultivar decision",
+      "transplant-vs-indoor packet maturity semantics",
       "Great Lakes September fall planting",
       "method-specific broccoli transplant/direct",
       "quick-harvest fallback",
@@ -39,26 +41,27 @@
       "Great Lakes radish repeat target",
       "Great Lakes garlic-window opening",
       "protected last-start shift in forward queue",
-      "future-weather boundary policy",
+      "year-boundary spring rollover",
       "garlic fall window",
       "long-season/heat-limited cool crop",
       "onion photoperiod",
-      "six-week queue UI contract"
+      "seed-packet checker UI contract"
     ],
     "ci": "PASS",
     "vercelPreview": "PASS",
     "productionSmoke": "required after merge"
   },
   "knownLimitations": [
+    "Seed-packet maturity conventions vary by crop and seed company; the UI explains the modeled distinction between transplant maturity and indoor seedling lead time.",
     "Soil temperature is an optional gardener-entered measurement; the tool does not infer soil temperature from air temperature.",
-    "Row-cover and low-tunnel extensions are conservative planning allowances, not local microclimate guarantees; cover material, wind, cloud, soil heat and ventilation change actual protection.",
-    "Temporary shade is modeled as an establishment aid only. It does not alter ambient forecast temperature or guarantee cool-crop success during prolonged heat.",
-    "The six-week queue is a crop-calendar work queue using climatology and biology. It deliberately does not project today's NWS forecast into future weeks.",
-    "Hot-climate mode still relies primarily on current 7-day heat plus crop class; future climatological heat normals or GDD would improve long-range precision."
+    "Row-cover and low-tunnel extensions are conservative planning allowances, not local microclimate guarantees.",
+    "Temporary shade is modeled as an establishment aid only and does not alter ambient forecast temperature.",
+    "The six-week queue is a crop-calendar work queue using climatology and biology; it deliberately does not project today's NWS forecast into future weeks.",
+    "Hot-climate mode still relies primarily on current 7-day heat plus crop class; climatological heat normals or GDD would improve long-range precision."
   ],
-  "valueScore": 95.96,
+  "valueScore": 96.22,
   "lossPenalty": 0,
-  "finalScore": 95.96,
+  "finalScore": 96.22,
   "criticalFloorMet": true,
   "releaseDecision": "PASS CODE/PREVIEW GATE; production smoke still required"
 }
