@@ -1,0 +1,200 @@
+document.addEventListener("DOMContentLoaded",function(){
+  const N=window.NationalTools,E=window.NationalPlantingEngine;
+  const form=document.getElementById("loc"),filter=document.getElementById("season-filter"),soil=document.getElementById("soil-temp");
+  let cropData=null,model=null,locData=null,plan=null,overrides={};
+
+  const esc=x=>N.esc(String(x??""));
+  const fmt=d=>d?d.toLocaleDateString([],{month:"short",day:"numeric"}):"—";
+  const methodLabel=m=>m==="direct"?"direct sow":m==="transplant"?"transplant":"start indoors";
+  const modeLabel=(crop,ev)=>{
+    if(!ev)return"";
+    if(ev.harvestMode&&ev.harvestMode!=="full"){
+      const m=(crop.harvest_modes||[]).find(x=>x.id===ev.harvestMode);
+      return m?.label||ev.harvestMode;
+    }
+    return crop.harvest_style==="cut-and-come-again"?"first harvest":"full harvest";
+  };
+  function stateLabel(ev){
+    if(!ev)return"Not evaluated";
+    return ev.state==="go"?"Plant now":ev.state==="caution"?"Plant — watch heat":ev.state==="last-chance"?"Last call":ev.state==="limited"?"Quick harvest only":ev.state==="blocked"?"Hold":ev.state==="early"?"Not yet":ev.state==="upcoming"?"Coming soon":ev.state==="done"?"Window passed":ev.state;
+  }
+  function stateClass(ev){return ev?.state==="last-chance"?"last":ev?.state==="limited"?"quick":ev?.state==="go"?"go":""}
+  function mmddDate(mmdd){return E.anchor(mmdd,new Date().getFullYear())}
+  function climateAnchors(c){
+    const spring=c?.dates?.spring_10?.mmdd||c?.dates?.spring_50?.mmdd;
+    const fall=c?.dates?.fall_10?.mmdd||c?.dates?.fall_50?.mmdd;
+    return{
+      spring:mmddDate(spring),fall:mmddDate(fall),
+      springLabel:c?.dates?.spring_10?.mmdd?"10% late-freeze probability":"median spring-freeze",
+      fallLabel:c?.dates?.fall_10?.mmdd?"10% early-freeze probability":fall?"median first-freeze":null
+    };
+  }
+  function mergeCropData(base,v3){
+    const crops=(base.crops||[]).map(c=>{
+      const raw=v3.overrides?.[c.id]||{};
+      const extraSources=raw.v3_sources||[];
+      const o={...raw};delete o.v3_sources;
+      return{...c,...o,sources:[...new Set([...(c.sources||[]),...extraSources])]};
+    }).concat(v3.add_crops||[]);
+    const sourceMap=new Map();
+    [...(base.sources||[]),...(v3.sources||[])].forEach(s=>sourceMap.set(s.key||s.id||s.name,s));
+    return{...base,version:v3.version,updated:v3.updated,crops,sources:[...sourceMap.values()]};
+  }
+  function context(){
+    const a=climateAnchors(model?.climate_normals);
+    return{
+      today:new Date(),springAnchor:a.spring,fallAnchor:a.fall,
+      freezeLevel:model?.freeze_verdict?.level,latitude:locData?.latitude,
+      currentForecast:model?.current_forecast||null,
+      maturityOverride:overrides,
+      soilTempF:soil.value===""?null:Number(soil.value)
+    };
+  }
+  function evaluationFor(row,kind){
+    if(kind==="direct")return row.direct;
+    if(kind==="transplant")return row.transplant;
+    if(kind==="indoor")return row.indoor;
+    return row.best||row.indoor;
+  }
+  function actionList(rows,kind,empty,limit=7){
+    if(!rows.length)return '<span class="empty">'+esc(empty)+'</span>';
+    return "<ul>"+rows.slice(0,limit).map(row=>{
+      const ev=evaluationFor(row,kind),c=row.crop;
+      const harvest=ev?.projectedHarvest?"Harvest ≈ "+fmt(ev.projectedHarvest)+" · "+modeLabel(c,ev):"";
+      const margin=ev?.marginDays!=null?(ev.marginDays<=7?" · "+Math.max(0,ev.marginDays)+" days of start-window margin":""):"";
+      return '<li><span class="crop-action-line"><strong>'+esc(c.name)+'</strong><span class="tag '+stateClass(ev)+'">'+esc(stateLabel(ev))+'</span></span><span class="action-meta">'+esc([harvest,ev?.reason].filter(Boolean).join(" · "))+esc(margin)+'</span></li>';
+    }).join("")+"</ul>";
+  }
+  function repeatList(rows){
+    if(!rows.length)return '<span class="empty">No repeat sowing remains after a planting made today.</span>';
+    return "<ul>"+rows.slice(0,7).map(r=>'<li><span class="crop-action-line"><strong>'+esc(r.crop.name)+'</strong><span class="tag go">'+fmt(r.succession.date)+'</span></span><span class="action-meta">Repeat in '+esc(r.succession.intervalDays)+' days if weather and bed space still fit.</span></li>').join("")+"</ul>";
+  }
+  function fallList(){
+    const rows=plan.now.fall.slice();
+    const garlic=plan.rows.find(r=>r.crop.id==="garlic");
+    if(garlic&&!rows.includes(garlic)&&garlic.direct&&["go","upcoming"].includes(garlic.direct.state))rows.push(garlic);
+    return actionList(rows,"best",plan.mode==="heat-limited"?"Cool-season crops are governed more by heat than a frost cutoff here.":"No high-confidence fall planting action is open today.",8);
+  }
+  function renderNow(){
+    document.getElementById("now-direct").innerHTML=actionList(plan.now.direct,"direct","No direct-sow crop has a strong planting window today.");
+    document.getElementById("now-transplant").innerHTML=actionList(plan.now.transplant,"transplant","No transplant crop has a strong planting window today.");
+    document.getElementById("now-indoor").innerHTML=actionList(plan.now.indoor,"indoor","No indoor start is a strong move today.");
+    document.getElementById("now-last").innerHTML=actionList(plan.now.lastCall,"best","No crop is currently in a last-call or quick-harvest window.");
+    document.getElementById("now-repeat").innerHTML=repeatList(plan.now.succession);
+    document.getElementById("now-fall").innerHTML=fallList();
+  }
+  function springText(r){
+    const x=[
+      r.spring.indoor&&"Indoors "+fmt(r.spring.indoor),
+      r.spring.direct&&"Direct "+fmt(r.spring.direct),
+      r.spring.setout&&"Transplant "+fmt(r.spring.setout)
+    ].filter(Boolean);
+    return x.join("<br>")||"Regional / specialty timing";
+  }
+  function fallText(r){
+    if(r.crop.id==="garlic"){
+      const g=r.direct;
+      return g?.earliest&&g?.latest?"Fall window ≈ "+fmt(g.earliest)+"–"+fmt(g.latest):"Use regional fall garlic timing";
+    }
+    if(plan.mode!=="frost-limited"&&r.crop.season==="cool")return"Heat-limited cool season; current conditions matter more than first 32°F.";
+    const x=[r.fallDirect&&"Direct ≈ "+fmt(r.fallDirect),r.fallTransplant&&"Transplant ≈ "+fmt(r.fallTransplant)].filter(Boolean);
+    return x.join("<br>")||"No reliable cold cutoff";
+  }
+  function todayVerdict(r){
+    const ev=r.best||r.indoor;
+    if(!ev)return'<span class="small">No viable method today</span>';
+    const cls=["blocked","done"].includes(ev.state)?" blocked":ev.state==="last-chance"?" last":"";
+    const harvest=ev.projectedHarvest?"<br><span class=small>"+esc(methodLabel(ev.method))+" · "+esc(modeLabel(r.crop,ev))+" ≈ "+fmt(ev.projectedHarvest)+"</span>":"";
+    return '<span class="verdict'+cls+'">'+esc(stateLabel(ev))+'</span>'+harvest+'<br><span class=small>'+esc(ev.reason||"")+'</span>';
+  }
+  function relayText(r){
+    if(!r.relays?.length)return'<span class="small">No modeled relay from this harvest yet.</span>';
+    return r.relays.map(x=>esc(x.crop.name)+" <span class=small>("+esc(methodLabel(x.method))+")</span>").join("<br>");
+  }
+  function sourceNames(c){
+    const map=new Map(cropData.sources.map(s=>[s.key||s.id||s.name,s.short_name||s.name]));
+    return (c.sources||[]).slice(0,3).map(k=>map.get(k)||k).join("; ");
+  }
+  function rowVisible(r,kind){
+    const viable=x=>x&&["go","caution","last-chance","limited","upcoming"].includes(x.state);
+    if(kind==="today")return viable(r.direct)||viable(r.transplant)||viable(r.indoor);
+    if(kind==="succession")return !!r.crop.succession_interval_days;
+    if(kind==="fall")return r.crop.season==="cool"||r.crop.overwinter;
+    if(kind==="cool"||kind==="warm")return r.crop.season===kind;
+    return true;
+  }
+  function renderTable(){
+    const rows=plan.rows.filter(r=>rowVisible(r,filter.value));
+    document.getElementById("crops").innerHTML=rows.map(r=>{
+      const c=r.crop,m=c.maturity_days,d=overrides[c.id]||m.default;
+      const ev=r.best||r.indoor;
+      const repeat=r.succession?"Next repeat "+fmt(r.succession.date):c.succession_interval_days?"Repeat every ~"+c.succession_interval_days+" days while the window stays open":"Not a routine repeat-sow crop";
+      const harvest=ev?.projectedHarvest?"Harvest ≈ "+fmt(ev.projectedHarvest)+" ("+modeLabel(c,ev)+")":"No today-harvest estimate";
+      const gates=[r.soilGate,r.heatGate,r.onionFit,c.frost_tolerance&&"Cold: "+c.frost_tolerance].filter(Boolean).join("<br>");
+      return '<tr>'+ 
+        '<td><span class="crop-name">'+esc(c.name)+'</span><br><span class=small>'+esc(c.season)+' season · '+esc(c.harvest_style)+'</span><br><label class=small>Packet days <input class="maturity-input" type="number" min="15" max="300" value="'+esc(d)+'" data-maturity="'+esc(c.id)+'" aria-label="'+esc(c.name)+' days to maturity"></label><br><span class=small>Typical '+esc(m.min)+'–'+esc(m.max)+' d</span></td>'+ 
+        '<td>'+todayVerdict(r)+'</td>'+ 
+        '<td><span class=small>'+esc(c.sow_methods.map(methodLabel).join(", "))+'</span><br>'+springText(r)+'</td>'+ 
+        '<td>'+fallText(r)+'</td>'+ 
+        '<td>'+esc(harvest)+'<br><span class=small>'+esc(repeat)+'</span></td>'+ 
+        '<td>'+relayText(r)+'</td>'+ 
+        '<td><span class=small>'+gates+'<br>'+esc(c.note)+'<br><em>'+esc(sourceNames(c))+'</em></span></td>'+ 
+      '</tr>';
+    }).join("")||'<tr><td colspan="7">No crops match this filter.</td></tr>';
+    document.querySelectorAll("[data-maturity]").forEach(el=>el.addEventListener("change",()=>{overrides[el.dataset.maturity]=Number(el.value);rebuild()}));
+  }
+  function renderSignals(){
+    const outdoor=new Set([...plan.now.direct,...plan.now.transplant].map(r=>r.crop.id)).size;
+    document.getElementById("sig-now").textContent=outdoor;
+    document.getElementById("sig-last").textContent=plan.now.lastCall.length;
+    document.getElementById("sig-repeat").textContent=plan.now.succession.length;
+    document.getElementById("sig-weather").textContent=plan.forecast.min==null&&plan.forecast.max==null?"Unavailable":Math.round(plan.forecast.min)+"–"+Math.round(plan.forecast.max)+"°F";
+  }
+  function rebuild(){
+    if(!cropData||!model||!locData)return;
+    plan=E.build(cropData.crops,context());
+    renderSignals();renderNow();renderTable();
+  }
+  async function run(loc){
+    const status=document.querySelector(".status");
+    const [fr,cr,vr]=await Promise.all([
+      fetch("/api/national-frost?lat="+encodeURIComponent(loc.latitude)+"&lon="+encodeURIComponent(loc.longitude)+(loc.postcode?"&zip="+encodeURIComponent(loc.postcode):"")),
+      fetch("/data/national-planting-crops.json"),
+      fetch("/data/national-planting-v3.json?v=20260903")
+    ]);
+    const x=await fr.json();
+    if(!fr.ok)throw new Error(x.error||"Planting climate data unavailable");
+    if(!cr.ok||!vr.ok)throw new Error("Crop timing data unavailable");
+    const baseData=await cr.json(),v3Data=await vr.json();
+    cropData=mergeCropData(baseData,v3Data);model=x;locData=loc;
+    const c=x.climate_normals||{},a=climateAnchors(c);
+    if(!a.spring&&!a.fall&&!x.current_forecast)throw new Error("A usable climate or forecast signal was not found near this location.");
+    document.getElementById("result").hidden=false;
+    document.getElementById("answer").textContent="Planting window near "+N.label(loc);
+    const parts=[];
+    if(a.spring)parts.push("spring anchor "+fmt(a.spring)+" ("+a.springLabel+")");
+    if(a.fall)parts.push("fall anchor "+fmt(a.fall)+" ("+a.fallLabel+")");
+    if(c.name)parts.push("NOAA station "+c.name+(c.distance_miles==null?"":" · "+c.distance_miles.toFixed(1)+" mi"));
+    if(c.confidence)parts.push("station fit "+c.confidence);
+    document.getElementById("base").textContent=parts.join(" · ")+(parts.length?". ":"")+"These are probability anchors, not guaranteed frost dates.";
+    const freeze=document.getElementById("freeze-pill");
+    freeze.textContent=x.freeze_verdict?.label||"Live cold forecast unavailable";
+    freeze.className="pill "+((x.freeze_verdict?.level==="freeze"||x.freeze_verdict?.level==="hard-freeze")?"danger":"");
+    plan=E.build(cropData.crops,context());
+    document.getElementById("mode-pill").textContent=plan.mode==="heat-limited"?"Heat-limited calendar":plan.mode==="long-season"?"Long-season calendar":"Frost-limited calendar";
+    document.getElementById("season-note").innerHTML=plan.mode==="heat-limited"
+      ?"<strong>Different rhythm here:</strong> cool crops belong mainly in the cooler months; heat is often the limiting factor, not a northern-style first/last-frost calendar."
+      :plan.mode==="long-season"
+        ?"<strong>Long season:</strong> this climate can support two strong cool-season shoulders around the warm season. The tool uses current heat plus crop biology instead of treating the first 32°F date as a universal stop."
+        :"<strong>Frost-limited season:</strong> late crops are evaluated against a crop-specific cold deadline, fall slowdown and safety time. Hardy crops are not automatically stopped at the first 32°F event.";
+    document.getElementById("mi").hidden=loc.stateCode!=="MI";
+    rebuild();
+    if(status)status.textContent="";
+    document.getElementById("result").scrollIntoView({behavior:"smooth",block:"start"});
+  }
+  soil.addEventListener("change",rebuild);
+  filter.addEventListener("change",renderTable);
+  N.bind(form,run);
+  const q=new URLSearchParams(location.search).get("q");
+  if(q){form.querySelector("input").value=q;form.requestSubmit()}
+});
