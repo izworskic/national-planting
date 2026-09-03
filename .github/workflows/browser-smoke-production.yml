@@ -2,9 +2,16 @@ name: Browser smoke production
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
     paths:
+      - 'public/national-tools/planting/**'
+      - 'public/assets/national-planting-*.js'
+      - 'public/data/national-planting*.json'
       - 'scripts/browser-smoke-production.mjs'
       - '.github/workflows/browser-smoke-production.yml'
+  schedule:
+    - cron: '23 11 * * *'
 jobs:
   smoke:
     runs-on: ubuntu-latest
