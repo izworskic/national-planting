@@ -1,22 +1,23 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "updated": "2026-09-03",
-  "benchmarkVersion": "2.1.0",
+  "benchmarkVersion": "2.2.0",
   "status": "pre-release-implementation-score",
   "valueRatings": [
-    {"id":"horticultural-correctness","weight":14,"rating":95,"weightedPoints":13.3},
-    {"id":"plant-today-runway","weight":13,"rating":98,"weightedPoints":12.74},
-    {"id":"succession-relay","weight":11,"rating":96,"weightedPoints":10.56},
-    {"id":"fall-cold-tolerance","weight":9,"rating":96,"weightedPoints":8.64},
+    {"id":"horticultural-correctness","weight":13,"rating":95,"weightedPoints":12.35},
+    {"id":"plant-today-runway","weight":12,"rating":98,"weightedPoints":11.76},
+    {"id":"succession-relay","weight":10,"rating":97,"weightedPoints":9.7},
+    {"id":"fall-cold-tolerance","weight":8,"rating":96,"weightedPoints":7.68},
     {"id":"crop-lifecycle","weight":7,"rating":96,"weightedPoints":6.72},
-    {"id":"local-climate","weight":8,"rating":95,"weightedPoints":7.6},
+    {"id":"local-climate","weight":7,"rating":95,"weightedPoints":6.65},
     {"id":"soil-heat-gating","weight":7,"rating":97,"weightedPoints":6.79},
-    {"id":"season-extension","weight":8,"rating":96,"weightedPoints":7.68},
+    {"id":"season-extension","weight":7,"rating":96,"weightedPoints":6.72},
+    {"id":"forward-planning","weight":8,"rating":95,"weightedPoints":7.6},
     {"id":"cultivar-harvest-variability","weight":6,"rating":96,"weightedPoints":5.76},
     {"id":"hot-climate-edge-cases","weight":6,"rating":92,"weightedPoints":5.52},
     {"id":"uncertainty-provenance","weight":5,"rating":96,"weightedPoints":4.8},
-    {"id":"actionability-ux","weight":4,"rating":97,"weightedPoints":3.88},
-    {"id":"source-maintainability","weight":2,"rating":97,"weightedPoints":1.94}
+    {"id":"actionability-ux","weight":3,"rating":98,"weightedPoints":2.94},
+    {"id":"source-maintainability","weight":1,"rating":97,"weightedPoints":0.97}
   ],
   "triggeredLosses": [],
   "scenarioTests": {
@@ -34,10 +35,15 @@
       "protected spring timing",
       "succession stop",
       "same-bed relay evaluation",
+      "six-week crop-calendar event grouping",
+      "Great Lakes radish repeat target",
+      "Great Lakes garlic-window opening",
+      "protected last-start shift in forward queue",
+      "future-weather boundary policy",
       "garlic fall window",
       "long-season/heat-limited cool crop",
       "onion photoperiod",
-      "protected-growing UI contract"
+      "six-week queue UI contract"
     ],
     "ci": "PASS",
     "vercelPreview": "PASS",
@@ -47,11 +53,12 @@
     "Soil temperature is an optional gardener-entered measurement; the tool does not infer soil temperature from air temperature.",
     "Row-cover and low-tunnel extensions are conservative planning allowances, not local microclimate guarantees; cover material, wind, cloud, soil heat and ventilation change actual protection.",
     "Temporary shade is modeled as an establishment aid only. It does not alter ambient forecast temperature or guarantee cool-crop success during prolonged heat.",
+    "The six-week queue is a crop-calendar work queue using climatology and biology. It deliberately does not project today's NWS forecast into future weeks.",
     "Hot-climate mode still relies primarily on current 7-day heat plus crop class; future climatological heat normals or GDD would improve long-range precision."
   ],
-  "valueScore": 95.93,
+  "valueScore": 95.96,
   "lossPenalty": 0,
-  "finalScore": 95.93,
+  "finalScore": 95.96,
   "criticalFloorMet": true,
   "releaseDecision": "PASS CODE/PREVIEW GATE; production smoke still required"
 }
