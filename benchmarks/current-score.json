@@ -1,0 +1,48 @@
+{
+  "version": "1.0.0",
+  "updated": "2026-09-03",
+  "benchmarkVersion": "2.0.0",
+  "status": "pre-release-implementation-score",
+  "valueRatings": [
+    {"id":"horticultural-correctness","weight":15,"rating":94,"weightedPoints":14.1},
+    {"id":"plant-today-runway","weight":14,"rating":98,"weightedPoints":13.72},
+    {"id":"succession-relay","weight":12,"rating":96,"weightedPoints":11.52},
+    {"id":"fall-cold-tolerance","weight":10,"rating":95,"weightedPoints":9.5},
+    {"id":"crop-lifecycle","weight":8,"rating":96,"weightedPoints":7.68},
+    {"id":"local-climate","weight":8,"rating":94,"weightedPoints":7.52},
+    {"id":"soil-heat-gating","weight":8,"rating":95,"weightedPoints":7.6},
+    {"id":"cultivar-harvest-variability","weight":6,"rating":96,"weightedPoints":5.76},
+    {"id":"hot-climate-edge-cases","weight":5,"rating":88,"weightedPoints":4.4},
+    {"id":"uncertainty-provenance","weight":5,"rating":94,"weightedPoints":4.7},
+    {"id":"actionability-ux","weight":5,"rating":96,"weightedPoints":4.8},
+    {"id":"source-maintainability","weight":4,"rating":96,"weightedPoints":3.84}
+  ],
+  "triggeredLosses": [],
+  "scenarioTests": {
+    "automated": [
+      "90-day exact-runway tender crop",
+      "Great Lakes September fall planting",
+      "method-specific broccoli transplant/direct",
+      "quick-harvest fallback",
+      "heat block",
+      "measured soil-temperature block",
+      "current freeze block",
+      "succession stop",
+      "same-bed relay evaluation",
+      "garlic fall window",
+      "long-season/heat-limited cool crop",
+      "onion photoperiod"
+    ],
+    "productionSmoke": "required after merge"
+  },
+  "knownLimitations": [
+    "Soil temperature is an optional gardener-entered measurement; the tool does not infer soil temperature from air temperature.",
+    "Cold extension after a 32F anchor is a crop-class planning allowance, not a local microclimate guarantee.",
+    "Hot-climate mode is deliberately conservative and relies on current 7-day heat plus crop class; future climatological heat normals or GDD would improve long-range precision."
+  ],
+  "valueScore": 95.14,
+  "lossPenalty": 0,
+  "finalScore": 95.14,
+  "criticalFloorMet": true,
+  "releaseDecision": "PASS CODE GATE; production smoke still required"
+}
