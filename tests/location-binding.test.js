@@ -5,6 +5,10 @@ const path=require("node:path");
 
 const script=fs.readFileSync(path.join(__dirname,"../public/assets/national-planting-page-v3.js"),"utf8");
 
+test("planting browser bundle parses as JavaScript",()=>{
+  assert.doesNotThrow(()=>new Function(script));
+});
+
 test("ZIP form has a self-contained binding fallback",()=>{
   assert.match(script,/function fallbackNationalTools\(\)/);
   assert.match(script,/NationalTools\|\|window\.NationalPlantingLocation\|\|fallbackNationalTools\(\)/);
