@@ -1,0 +1,44 @@
+{
+  "version": "1.0.0",
+  "updated": "2026-09-02",
+  "status": "active-product-benchmark",
+  "objective": "Turn a city or ZIP into an expert-grade, whole-year planting decision system that maximizes useful harvest windows without pretending frost dates or crop maturity are exact.",
+  "passScore": 90,
+  "criticalFloor": 85,
+  "valueFunctions": [
+    {"id":"horticultural-correctness","weight":18,"critical":true,"definition":"Recommendations respect crop biology, sowing method, maturity, frost tolerance and source-backed agronomic rules."},
+    {"id":"fall-succession","weight":11,"critical":true,"definition":"The calendar calculates fall windows backward from cold risk, applies slower late-season growth and schedules successions until the last viable sowing."},
+    {"id":"local-climate","weight":10,"critical":true,"definition":"Uses local freeze probability as a climate anchor, keeps current forecast risk separate, and never treats USDA hardiness zone as a planting-date engine."},
+    {"id":"soil-heat-gating","weight":8,"critical":true,"definition":"Shows minimum/optimal soil temperature and heat/bolting limits where relevant instead of relying on dates alone."},
+    {"id":"crop-lifecycle","weight":8,"critical":true,"definition":"Separates indoor start, direct sow, hardening and transplant timing and respects transplant-sensitive crops."},
+    {"id":"cultivar-variability","weight":7,"critical":false,"definition":"Days-to-maturity is a range/default that users can override; output explains that seed-packet cultivar data wins."},
+    {"id":"hot-climate-edge-cases","weight":7,"critical":true,"definition":"Warm/subtropical climates can produce fall/winter recommendations and heat-limited summer gaps rather than a northern spring-only calendar."},
+    {"id":"whole-bed-utilization","weight":7,"critical":false,"definition":"Outputs follow-on crop ideas after harvest so the same bed can be used through multiple seasons."},
+    {"id":"uncertainty-provenance","weight":6,"critical":true,"definition":"Displays probability/source/confidence and distinguishes climatology, current forecast and heuristic fallback."},
+    {"id":"actionability-ux","weight":6,"critical":false,"definition":"A gardener can immediately see plant now, start indoors, transplant, next succession, last viable date and harvest window."},
+    {"id":"resilience-performance","weight":5,"critical":false,"definition":"Static crop logic works fail-soft when live forecast data is missing; no unnecessary per-crop API calls."},
+    {"id":"search-value","weight":4,"critical":false,"definition":"One canonical useful tool answers planting-now, fall garden and succession intents without thin location doorway pages."},
+    {"id":"maintainability","weight":3,"critical":false,"definition":"Crop rules are structured, source-traceable and decision logic is testable outside the page."}
+  ],
+  "scenarioMatrix": [
+    {"id":"cold-north","example":"Minneapolis, MN","mustProve":["short warm season","fall brassicas/roots/greens","frost-hardy crops extend beyond first 32F risk"]},
+    {"id":"great-lakes","example":"Bay City, MI","mustProve":["spring cool crops","summer successions","backward fall scheduling","overwinter garlic/spinach candidates"]},
+    {"id":"mid-atlantic","example":"Richmond, VA","mustProve":["two strong cool-season shoulders","warm crops","fall succession"]},
+    {"id":"gulf-south","example":"Houston, TX","mustProve":["fall/winter garden importance","summer heat cautions","weak frost anchor handled honestly"]},
+    {"id":"desert","example":"Phoenix, AZ","mustProve":["summer heat limitation","cool-season fall/winter emphasis","no fake frost precision"]},
+    {"id":"maritime","example":"Seattle, WA","mustProve":["long cool shoulder seasons","bolting/heat rules","fall/overwinter opportunities"]},
+    {"id":"high-elevation","example":"Denver, CO","mustProve":["shorter frost-free window","soil temperature gating","maturity buffers"]},
+    {"id":"frost-light","example":"Miami, FL","mustProve":["heat-limited season model","no spring-frost-only failure","cool crops routed to winter"]}
+  ],
+  "automaticRejects": [
+    "USDA hardiness zone used as the primary planting-date calculation",
+    "single spring date with no fall or succession logic",
+    "fall planting equals spring days-to-maturity with no slowdown/safety buffer",
+    "transplant-sensitive root crops recommended as routine transplants",
+    "warm-season seed recommended into soil below crop minimum",
+    "lettuce/spinach/cilantro recommended through severe heat without warning",
+    "exact first/last frost date presented as certainty",
+    "frost-free climates told that no calendar can be built",
+    "new thin city or ZIP canonical pages created for SEO"
+  ]
+}
