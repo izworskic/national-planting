@@ -347,26 +347,119 @@ body[data-editorial-tool-ui] :focus-visible{outline:3px solid var(--editorial-gr
 }
 @media(prefers-reduced-motion:reduce){body[data-editorial-tool-ui]{scroll-behavior:auto!important}}
 </style>
-</head><body data-editorial-tool-ui="2026-09">
+
+<style id="planting-editorial-v2">
+body[data-planting-ui="v2"] .hero .lede{max-width:700px!important}
+body[data-planting-ui="v2"] .planting-start{
+  margin:0 0 18px;padding:18px;border:1px solid var(--editorial-line);
+  border-top:4px solid var(--editorial-green);border-radius:6px;background:#fff;
+}
+body[data-planting-ui="v2"] .planting-start h2{margin:0 0 4px!important;font-size:22px!important}
+body[data-planting-ui="v2"] .planting-start>p{margin:0 0 12px;color:var(--editorial-muted);font-size:13.5px}
+body[data-planting-ui="v2"] .planting-start .locator{padding:0!important;border:0!important;background:transparent!important}
+body[data-planting-ui="v2"] .location-privacy-wrap{margin-top:7px}
+body[data-planting-ui="v2"] .location-privacy-wrap summary{
+  cursor:pointer;color:#77736d;font:11.5px/1.4 Arial,sans-serif
+}
+body[data-planting-ui="v2"] .location-privacy-wrap p{margin:6px 0 0!important}
+body[data-planting-ui="v2"] .planting-result{padding:0!important;border-top:0!important;overflow:hidden}
+body[data-planting-ui="v2"] .plan-summary{
+  padding:18px 18px 16px;border-top:4px solid var(--editorial-green);
+  border-bottom:1px solid #e8e4dc;background:#fff;
+}
+body[data-planting-ui="v2"] .plan-summary #base{margin:6px 0 0;color:#666158;font-size:13px}
+body[data-planting-ui="v2"] .plan-summary .season-callout{
+  margin:12px 0 0!important;padding:11px 13px!important;border-left:3px solid var(--editorial-green)!important;
+  background:var(--editorial-green-soft)!important;font-size:13px
+}
+body[data-planting-ui="v2"] .now-block{padding:18px}
+body[data-planting-ui="v2"] .now-block h2,
+body[data-planting-ui="v2"] .full-plan h2{margin:0 0 4px!important;font-size:23px!important}
+body[data-planting-ui="v2"] .section-deck{margin:0 0 14px;color:#77736d;font-size:13px}
+body[data-planting-ui="v2"] .expert-grid{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:0 24px!important;margin:0!important
+}
+body[data-planting-ui="v2"] .expert-card{
+  padding:14px 0!important;border:0!important;border-bottom:1px solid #ece7dd!important;
+  border-radius:0!important;background:transparent!important
+}
+body[data-planting-ui="v2"] .expert-card h3{margin:0 0 6px!important;font-size:17px!important;color:var(--editorial-night)!important}
+body[data-planting-ui="v2"] .expert-card ul{margin:0;padding-left:18px}
+body[data-planting-ui="v2"] .expert-card li{margin:3px 0;font-size:13px}
+body[data-planting-ui="v2"] .full-plan{padding:18px;border-top:1px solid #e8e4dc;background:#fbfaf7}
+body[data-planting-ui="v2"] .full-plan-head{
+  display:flex;align-items:end;justify-content:space-between;gap:18px;margin-bottom:10px
+}
+body[data-planting-ui="v2"] .filter-row{
+  display:flex;align-items:center;gap:8px;margin:0!important;white-space:nowrap
+}
+body[data-planting-ui="v2"] .filter-row label{font:700 11px/1.3 Arial,sans-serif;color:#666158}
+body[data-planting-ui="v2"] .filter-row select{min-height:36px!important;font-size:13px!important}
+body[data-planting-ui="v2"] .crop-table{font-size:12.5px}
+body[data-planting-ui="v2"] .crop-table td{padding:11px 10px!important}
+body[data-planting-ui="v2"] .crop-table th{padding:9px 10px!important}
+body[data-planting-ui="v2"] .maturity-input{min-height:30px!important;width:4.8rem!important;font-size:13px!important}
+body[data-planting-ui="v2"] .methodology{margin:26px 0 0}
+body[data-planting-ui="v2"] .method-details{
+  border-top:1px solid #e8e4dc;padding:13px 0
+}
+body[data-planting-ui="v2"] .method-details summary{
+  cursor:pointer;color:var(--editorial-green);font:400 17px/1.4 Georgia,"Times New Roman",serif
+}
+body[data-planting-ui="v2"] .method-details .details-body{
+  padding:12px 0 2px;color:#5f5b55;font-size:13.5px
+}
+body[data-planting-ui="v2"] .method-details h3{font-size:16px!important;margin:10px 0 4px!important}
+body[data-planting-ui="v2"] .method-details p{margin:0 0 10px}
+body[data-planting-ui="v2"] .source-list{margin:7px 0 0;padding-left:20px}
+body[data-planting-ui="v2"] .source-list li{font-size:13px;margin:5px 0}
+@media(max-width:720px){
+  body[data-planting-ui="v2"] .expert-grid{grid-template-columns:1fr!important}
+  body[data-planting-ui="v2"] .full-plan-head{display:block}
+  body[data-planting-ui="v2"] .filter-row{margin-top:10px!important}
+}
+</style>
+</head><body data-editorial-tool-ui="2026-09" data-planting-ui="v2">
 <header class="site-head"><div class="wrap head-in"><a class="brand" href="/">Chris Izworski</a><nav class="nav" aria-label="Primary"><a href="/">Home</a><a href="/tools/">Michigan Tools</a><a href="/national-tools/" aria-current="page">U.S. Outdoor Tools</a></nav></div></header>
 <main>
-<section class="hero"><div class="wrap"><div class="breadcrumb"><a href="/">Home</a> &rsaquo; <a href="/national-tools/">U.S. Outdoor Tools</a> &rsaquo; Planting Calendar by Location</div><div class="eyebrow">Whole-year garden timing · NOAA + Cooperative Extension</div><h1>Planting Calendar by Location</h1><p class="lede">Not just a spring frost date. See what to sow, start indoors or transplant now, when to plant the next succession, how late a fall crop can still make it, and what can follow it in the same bed.</p></div></section>
+<section class="hero"><div class="wrap"><div class="breadcrumb"><a href="/">Home</a> &rsaquo; <a href="/national-tools/">U.S. Outdoor Tools</a> &rsaquo; Planting Calendar by Location</div><div class="eyebrow">Garden timing · NOAA + Cooperative Extension</div><h1>Planting Calendar by Location</h1><p class="lede">See what to plant now, what to start indoors, and how the rest of your garden year lines up for your location.</p></div></section>
 <section class="section"><div class="wrap">
-<div class="tool-nav"><a href="/national-tools/">All U.S. tools</a><a href="/national-tools/frost/">Frost dates</a><a href="/national-tools/rivers/">Rivers</a></div>
-<form id="loc" class="locator"><input aria-label="U.S. city or ZIP" placeholder="City or ZIP" required><button class="btn" type="submit">Build my garden year</button><button type="button" class="secondary-btn geo-btn" data-use-location>Use my location</button></form><p class="near-me-note">Works anywhere in the United States. The location sets climate anchors; the crop rules decide whether frost, soil warmth, summer heat or day length is actually the limiting factor.</p>
-<p class="location-privacy">Optional. Your browser shares a location rounded to about 0.001° only after you tap. It is used to load nearby conditions and is not included in analytics.</p><div class="status" aria-live="polite"></div>
-<div id="result" class="result" hidden>
- <div class="result-head"><span class="pill">Whole-year planting logic</span><span id="freeze-pill" class="pill"></span><span id="mode-pill" class="pill"></span></div>
- <div id="answer" class="answer"></div><p id="base"></p><div id="season-note" class="season-callout"></div>
- <h2>What should I do now?</h2><div id="now-actions" class="expert-grid"></div>
- <div class="filter-row"><label for="season-filter"><strong>Show crops</strong></label><select id="season-filter"><option value="all">All crops</option><option value="cool">Cool-season</option><option value="warm">Warm-season</option></select></div>
- <div class="table-wrap"><table class="crop-table"><thead><tr><th>Crop</th><th>Spring / method</th><th>Fall & succession</th><th>Harvest / next bed</th><th>Biology gates</th></tr></thead><tbody id="crops"></tbody></table></div>
- <p class="small"><strong>Cultivar rule:</strong> enter the days-to-maturity printed on your seed packet when it differs from the default. The tool recalculates the fall cutoff and harvest estimate. Soil temperature, actual weather and your local Extension office still get the final say.</p>
+<div class="tool-nav"><a href="/national-tools/">All U.S. tools</a><a href="/national-tools/garden/">Garden tools</a><a href="/national-tools/frost/">Frost dates</a></div>
+<div class="planting-start">
+  <h2>Start with your location</h2>
+  <p>Use a city or ZIP to build a garden calendar for that climate.</p>
+  <form id="loc" class="locator"><input aria-label="U.S. city or ZIP" placeholder="City or ZIP" required><button class="btn" type="submit">See my planting calendar</button><button type="button" class="secondary-btn geo-btn" data-use-location>Use my location</button></form>
+  <details class="location-privacy-wrap"><summary>Location and privacy</summary><p class="location-privacy">Your browser shares a location rounded to about 0.001° only after you tap. It is used to load nearby conditions and is not included in analytics.</p></details>
+  <div class="status" aria-live="polite"></div>
+</div>
+<div id="result" class="result planting-result" hidden>
+  <div class="plan-summary">
+    <div class="result-head"><span class="pill">Your garden year</span><span id="freeze-pill" class="pill"></span><span id="mode-pill" class="pill"></span></div>
+    <div id="answer" class="answer"></div><p id="base"></p><div id="season-note" class="season-callout"></div>
+  </div>
+  <div class="now-block">
+    <h2>What should I do now?</h2>
+    <p class="section-deck">The highest-value actions for this point in your local season.</p>
+    <div id="now-actions" class="expert-grid"></div>
+  </div>
+  <div class="full-plan">
+    <div class="full-plan-head">
+      <div><h2>Plan the rest of the garden year</h2><p class="section-deck">Spring, succession, fall timing, harvest estimates and what can follow in the bed.</p></div>
+      <div class="filter-row"><label for="season-filter">Show</label><select id="season-filter"><option value="all">All crops</option><option value="cool">Cool-season</option><option value="warm">Warm-season</option></select></div>
+    </div>
+    <div class="table-wrap"><table class="crop-table"><thead><tr><th>Crop</th><th>Spring / method</th><th>Fall & succession</th><th>Harvest / next bed</th><th>Biology gates</th></tr></thead><tbody id="crops"></tbody></table></div>
+    <p class="small"><strong>Using a specific cultivar?</strong> Change its days-to-maturity in the table and the fall cutoff and harvest estimate recalculate.</p>
+  </div>
 </div>
 <div id="mi" class="handoff" hidden><strong>Michigan gardener?</strong> This national engine handles whole-year timing. The established <a href="/zone-6a-planting-calendar/">Michigan Planting Calendar</a> remains available for the deeper Michigan-specific station model.</div>
 </div></section>
-<section class="section"><div class="wrap grid"><div class="source-box"><h2>Why this is different from a zone calendar</h2><p>USDA hardiness zones describe extreme winter minimums. They do not tell you when a bean seed can germinate, when lettuce will bolt, or whether a fall broccoli crop has enough time left. This engine starts with local NOAA freeze climatology, then applies crop-specific maturity, cold tolerance, soil-temperature, heat and succession rules.</p><p>The current NWS cold forecast is a separate near-term safety check. Climate normals describe risk; weather describes what is coming this week.</p></div><div class="source-box"><h2>Fall is calculated, not tacked on</h2><p>For frost-limited climates, the last viable fall sowing is worked backward from the local fall cold-risk anchor using the crop's maturity time, a late-season slowdown factor and a safety buffer. Hardy crops are allowed more cold runway than tender crops.</p><p>In hot or nearly frost-free climates, the tool switches emphasis: cool-season vegetables become fall/winter crops and summer heat can matter more than frost.</p></div></div></section>
-<section class="section"><div class="wrap"><h2>Evidence behind the crop rules</h2><ul class="source-list"><li><a href="https://www.ncei.noaa.gov/news/last-spring-freeze">NOAA/NCEI 1991–2020 climate normals</a> for freeze-probability interpretation.</li><li><a href="https://ag.purdue.edu/department/hla/extension/extension-publications-library/ext-pubs/ho-186-w.html">Purdue Extension HO-186</a> for vegetable timing and germination soil-temperature ranges.</li><li><a href="https://extension.umn.edu/garden-and-home/yard-and-garden/gardening-in-minnesota/planting-vegetables-in-midsummer-for-fall-harvest">University of Minnesota Extension</a> for fall maturity and cold hardiness.</li><li><a href="https://franklin.mgcafe.uky.edu/program-areas/horticulture/succession-planting">University of Kentucky Extension</a> for succession-planting principles.</li><li><a href="https://lancaster.unl.edu/onions-long-day-short-day-or-neutral/">Nebraska Extension</a> for onion day-length classes.</li></ul></div></section>
+<section class="section methodology"><div class="wrap">
+  <details class="method-details"><summary>How the calendar decides your dates</summary><div class="details-body">
+    <h3>More than a hardiness zone</h3><p>USDA hardiness zones describe winter minimums. This calendar instead starts with local NOAA freeze climatology, then applies crop maturity, cold tolerance, soil-temperature, heat and succession rules.</p>
+    <h3>Fall timing is calculated</h3><p>Where frost matters, fall sowing is worked backward from local cold-risk anchors with crop-specific maturity, slowdown and safety time. In hot or nearly frost-free climates, cool-season crops shift toward fall, winter and early spring.</p>
+  </div></details>
+  <details class="method-details"><summary>Sources and evidence</summary><div class="details-body"><ul class="source-list"><li><a href="https://www.ncei.noaa.gov/news/last-spring-freeze">NOAA/NCEI 1991–2020 climate normals</a></li><li><a href="https://ag.purdue.edu/department/hla/extension/extension-publications-library/ext-pubs/ho-186-w.html">Purdue Extension vegetable timing and soil-temperature guidance</a></li><li><a href="https://extension.umn.edu/garden-and-home/yard-and-garden/gardening-in-minnesota/planting-vegetables-in-midsummer-for-fall-harvest">University of Minnesota Extension fall-harvest guidance</a></li><li><a href="https://franklin.mgcafe.uky.edu/program-areas/horticulture/succession-planting">University of Kentucky Extension succession-planting guidance</a></li><li><a href="https://lancaster.unl.edu/onions-long-day-short-day-or-neutral/">Nebraska Extension onion day-length guidance</a></li></ul></div></details>
+</div></section>
 </main>
 <footer class="footer"><div class="wrap">© 2026 <a href="/">Chris Izworski</a> · Public data turned into clearer decisions, with source and uncertainty shown.</div></footer>
 <script src="/assets/national-tools.js?v=20260901-placebar1"></script><script src="/assets/national-planting-engine.js?v=20260902-expert1"></script>
