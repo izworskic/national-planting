@@ -1,21 +1,22 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "updated": "2026-09-03",
-  "benchmarkVersion": "2.0.0",
+  "benchmarkVersion": "2.1.0",
   "status": "pre-release-implementation-score",
   "valueRatings": [
-    {"id":"horticultural-correctness","weight":15,"rating":94,"weightedPoints":14.1},
-    {"id":"plant-today-runway","weight":14,"rating":98,"weightedPoints":13.72},
-    {"id":"succession-relay","weight":12,"rating":96,"weightedPoints":11.52},
-    {"id":"fall-cold-tolerance","weight":10,"rating":95,"weightedPoints":9.5},
-    {"id":"crop-lifecycle","weight":8,"rating":96,"weightedPoints":7.68},
-    {"id":"local-climate","weight":8,"rating":94,"weightedPoints":7.52},
-    {"id":"soil-heat-gating","weight":8,"rating":95,"weightedPoints":7.6},
+    {"id":"horticultural-correctness","weight":14,"rating":95,"weightedPoints":13.3},
+    {"id":"plant-today-runway","weight":13,"rating":98,"weightedPoints":12.74},
+    {"id":"succession-relay","weight":11,"rating":96,"weightedPoints":10.56},
+    {"id":"fall-cold-tolerance","weight":9,"rating":96,"weightedPoints":8.64},
+    {"id":"crop-lifecycle","weight":7,"rating":96,"weightedPoints":6.72},
+    {"id":"local-climate","weight":8,"rating":95,"weightedPoints":7.6},
+    {"id":"soil-heat-gating","weight":7,"rating":97,"weightedPoints":6.79},
+    {"id":"season-extension","weight":8,"rating":96,"weightedPoints":7.68},
     {"id":"cultivar-harvest-variability","weight":6,"rating":96,"weightedPoints":5.76},
-    {"id":"hot-climate-edge-cases","weight":5,"rating":88,"weightedPoints":4.4},
-    {"id":"uncertainty-provenance","weight":5,"rating":94,"weightedPoints":4.7},
-    {"id":"actionability-ux","weight":5,"rating":96,"weightedPoints":4.8},
-    {"id":"source-maintainability","weight":4,"rating":96,"weightedPoints":3.84}
+    {"id":"hot-climate-edge-cases","weight":6,"rating":92,"weightedPoints":5.52},
+    {"id":"uncertainty-provenance","weight":5,"rating":96,"weightedPoints":4.8},
+    {"id":"actionability-ux","weight":4,"rating":97,"weightedPoints":3.88},
+    {"id":"source-maintainability","weight":2,"rating":97,"weightedPoints":1.94}
   ],
   "triggeredLosses": [],
   "scenarioTests": {
@@ -25,24 +26,32 @@
       "method-specific broccoli transplant/direct",
       "quick-harvest fallback",
       "heat block",
+      "temporary-shade managed heat without forecast rewriting",
       "measured soil-temperature block",
       "current freeze block",
+      "cool-crop kill-threshold block under protection",
+      "row-cover and low-tunnel cool-crop extension only",
+      "protected spring timing",
       "succession stop",
       "same-bed relay evaluation",
       "garlic fall window",
       "long-season/heat-limited cool crop",
-      "onion photoperiod"
+      "onion photoperiod",
+      "protected-growing UI contract"
     ],
+    "ci": "PASS",
+    "vercelPreview": "PASS",
     "productionSmoke": "required after merge"
   },
   "knownLimitations": [
     "Soil temperature is an optional gardener-entered measurement; the tool does not infer soil temperature from air temperature.",
-    "Cold extension after a 32F anchor is a crop-class planning allowance, not a local microclimate guarantee.",
-    "Hot-climate mode is deliberately conservative and relies on current 7-day heat plus crop class; future climatological heat normals or GDD would improve long-range precision."
+    "Row-cover and low-tunnel extensions are conservative planning allowances, not local microclimate guarantees; cover material, wind, cloud, soil heat and ventilation change actual protection.",
+    "Temporary shade is modeled as an establishment aid only. It does not alter ambient forecast temperature or guarantee cool-crop success during prolonged heat.",
+    "Hot-climate mode still relies primarily on current 7-day heat plus crop class; future climatological heat normals or GDD would improve long-range precision."
   ],
-  "valueScore": 95.14,
+  "valueScore": 95.93,
   "lossPenalty": 0,
-  "finalScore": 95.14,
+  "finalScore": 95.93,
   "criticalFloorMet": true,
-  "releaseDecision": "PASS CODE GATE; production smoke still required"
+  "releaseDecision": "PASS CODE/PREVIEW GATE; production smoke still required"
 }
