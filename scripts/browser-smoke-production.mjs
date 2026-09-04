@@ -18,8 +18,9 @@ try{
     page.on('console',msg=>{if(msg.type()==='error')consoleErrors.push(msg.text())});
     page.on('requestfailed',req=>errors.push(`REQUEST FAILED ${req.method()} ${req.url()} :: ${req.failure()?.errorText||''}`));
     try{
-      const url=origin+'?browser_smoke='+Date.now()+'-'+testCase.name;
-      const response=await page.goto(url,{waitUntil:'networkidle',timeout:60000});
+      // Deliberately hit the exact public canonical URL. A query-string cache
+      // buster can hide a stale CDN object and give a false green smoke test.
+      const response=await page.goto(origin,{waitUntil:'networkidle',timeout:60000});
       const ui=await page.locator('body').getAttribute('data-planting-ui');
       const script=await page.locator('script[src*="national-planting-page-v3.js"]').getAttribute('src');
       console.log(testCase.name.toUpperCase(),'PAGE',response?.status(),page.url());
