@@ -52,16 +52,16 @@
  }
  const seeds={
   peas:{name:"Peas",minimum:40,preferred:45,type:"cool",warning:"Soil above 40°F may allow emergence, but very cold saturated soil slows germination."},
-  spinach:{name:"Spinach",minimum:40,preferred:45,type:"cool",warning:"Very warm soil can inhibit spinach germination."},
-  lettuce:{name:"Lettuce",minimum:40,preferred:50,type:"cool",warning:"Soil heat above 85°F can suppress germination for some lettuces."},
+  spinach:{name:"Spinach",minimum:35,preferred:45,type:"cool",warning:"Very warm soil can inhibit spinach germination."},
+  lettuce:{name:"Lettuce",minimum:35,preferred:50,type:"cool",warning:"Soil heat above 85°F can suppress germination for some lettuces."},
   radish:{name:"Radishes",minimum:40,preferred:50,type:"cool",warning:"Radishes can germinate in cool soil; hot soil may hurt root quality."},
   carrots:{name:"Carrots",minimum:40,preferred:50,type:"cool",warning:"Carrots can take longer to germinate in low soil temperatures."},
-  beets:{name:"Beets",minimum:45,preferred:50,type:"cool",warning:"A thermometer at seed depth is more useful than daily air highs."},
+  beets:{name:"Beets",minimum:40,preferred:50,type:"cool",warning:"A thermometer at seed depth is more useful than daily air highs."},
   beans:{name:"Bush and pole beans",minimum:60,preferred:65,type:"warm",warning:"Beans often rot in cold, soggy ground. Avoid sowing into soil below 60°F."},
-  sweetcorn:{name:"Sweet corn (standard)",minimum:60,preferred:65,type:"warm",warning:"Sweet corn has cultivar-specific germination requirements; supersweet may require warmer soil."},
+  sweetcorn:{name:"Sweet corn (standard)",minimum:50,preferred:65,type:"warm",warning:"Sweet corn has cultivar-specific germination requirements; supersweet may require warmer soil."},
   cucumbers:{name:"Cucumbers",minimum:60,preferred:65,type:"warm",warning:"Cold wet soil risks seed rot; 60°F is a minimum practical screen, not the optimum."},
   squash:{name:"Summer and winter squash",minimum:60,preferred:65,type:"warm",warning:"Warm soils improve emergence; cold waterlogged soil risks seed rot."},
-  melons:{name:"Melons",minimum:65,preferred:70,type:"warm",warning:"Melons generally need warmer soil than most cool-season crops."}
+  melons:{name:"Melons",minimum:60,preferred:70,type:"warm",warning:"Melons generally need warmer soil than most cool-season crops."}
  };
  function soilReadiness(input,feed,now=new Date()){
    const c=core.context(feed,now),crop=seeds[input.crop]||seeds.beans;
@@ -82,13 +82,13 @@
    const crop=pick(input.crop,["warm","cool","flower"],"warm");
    const day=num(input.day,0,14);const condition=pick(input.exposure,["shade","partial","sun","wind"],"shade");
    const tender=crop==="warm"||crop==="flower",minimum=tender?45:36;
-   const daytime=(c.forecastState==="CURRENT"&&c.low7d!==null);
+   
    const imminent=c.nextFrostRiskHours!==null&&c.nextFrostRiskHours<=48;
    if(day===null)return output("NEED_PROGRESS","Which hardening-off day are you on?","Gradual exposure is essential, and elapsed acclimation time changes a safe plan.",["Choose the number of days you have been moving seedlings outdoors, starting at zero.","Start with a protected, shaded few hours during mild weather."],c);
-   if(day===0)return output("START_SHADED","Start with a brief sheltered outing","Indoor seedlings have not yet adapted to outdoor UV, breeze or temperature changes.",["Place in bright shade sheltered from strong wind for roughly 1–2 hours on a mild day.","Bring seedlings indoors before evening temperatures drop.","Keep seed trays watered but avoid waterlogged soil."],c,["University of Minnesota Extension recommends gradually increasing sun and outdoor time over about two weeks."]);
-   if(condition==="wind")return output("SHELTER_FIRST","Strong wind: use shelter, not an endurance test","Young seedlings can lose moisture and sustain mechanical damage in wind, even if temperatures are mild.",["Move them to a sheltered porch or cold frame with ventilation.","Resume more exposed conditions gradually as stems and leaves strengthen."],c);
    if(imminent)return output("PROTECT_FROM_FROST","Forecast frost risk: bring seedlings in","An NWS hour at or below 36°F occurs within the next 48 hours; containers may cool rapidly.",["Bring tender trays indoors before cold weather.","If seedlings are outdoors in a cold frame, ensure a suitable frost-free temperature; a cover is not a guarantee.","Resume gradual exposure when the immediate cold risk passes."],c);
    if(c.forecastState!=="CURRENT")return output("VERIFY_LOCAL_FORECAST","Forecast unavailable: do not assume outdoor nights are safe","The source is stale or unavailable. Gradual shade exposure can be planned, but safety depends on current local conditions.",["Check current overnight temperature and wind independently.","Keep seedlings indoors overnight until cold risk is verified.","Return when live hourly weather data are available."],c);
+   if(condition==="wind")return output("SHELTER_FIRST","Strong wind: use shelter, not an endurance test","Young seedlings can lose moisture and sustain mechanical damage in wind, even if temperatures are mild.",["Move them to a sheltered porch or cold frame with ventilation.","Resume more exposed conditions gradually as stems and leaves strengthen."],c);
+   if(day===0)return output("START_SHADED","Start with a brief sheltered outing","Indoor seedlings have not yet adapted to outdoor UV, breeze or temperature changes.",["Place in bright shade sheltered from strong wind for roughly 1–2 hours on a mild day.","Bring seedlings indoors before evening temperatures drop.","Keep seed trays watered but avoid waterlogged soil."],c,["University of Minnesota Extension recommends gradually increasing sun and outdoor time over about two weeks."]);
    if(tender&&c.low7d!==null&&c.low7d<minimum)return output("DAYTIME_ONLY","Keep tender seedlings indoors overnight","The seven-day forecast contains lows below "+minimum+"°F; many warm-season seedlings can be stressed before freezing.",["Use brief sheltered daytime outings during warm weather, followed by indoor nights.","Build tolerance gradually without exposing tender plants to frost or chilling.","Check the forecast daily for safer transplant weather."],c);
    if(day<=3)return output("SHADE_STAGE","Increase protected outdoor time gradually","You are in the first days of hardening off; direct midday sun can scorch leaves.",["Aim for a few hours of dappled light, then return indoors overnight.","Add short intervals of gentle morning sun and shelter from strong wind."],c);
    if(day<=7)return output(condition==="sun"?"REDUCE_SUN":"ADD_SUN_GRADUALLY",condition==="sun"?"Ease back from full sun":"Add morning sun in stages","The middle of hardening off should build light and wind tolerance without sudden all-day full-sun exposure.",["Extend outdoor time gradually and expose plants to a little more sun each day.","Move back to shelter if leaves bleach, wilt persistently or wind dries containers.","Keep tender transplants in at night until night temperatures are reliably suitable."],c);
