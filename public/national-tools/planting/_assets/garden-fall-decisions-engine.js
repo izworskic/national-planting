@@ -33,7 +33,7 @@
    const fresh=Number.isFinite(updated)&&updated<=now.getTime()+HOURS&&now.getTime()-updated<=12*HOURS;
    const hasPeriods=Array.isArray(feed?.current_forecast?.periods)&&feed.current_forecast.periods.length>0;
    const hours=fresh&&hasPeriods?feed.current_forecast.periods
-     .map(p=>({time:Date.parse(p.time),temp:p.unit==="C"?n(p.temp_f)*9/5+32:n(p.temp_f)}))
+     .map(p=>{const raw=n(p.temp_f);return {time:Date.parse(p.time),temp:raw===null?null:(p.unit==="C"?raw*9/5+32:raw)};})
      .filter(p=>Number.isFinite(p.time)&&p.temp!==null&&p.time>=now.getTime()-2*HOURS&&p.time<=now.getTime()+7*DAY):[];
    const alert=hours.filter(x=>x.temp<=36).sort((a,b)=>a.time-b.time)[0]||null;
    const freeze=hours.filter(x=>x.temp<=32).sort((a,b)=>a.time-b.time)[0]||null;
@@ -123,7 +123,7 @@
      return result("POSSIBLE","Winter rye may still be possible","Winter rye is among the latest-planted reliable fall cover crops, but late sowing yields less fall biomass.",["Sow into a prepared, workable bed with seed-to-soil contact and adequate moisture.","Plan to terminate the rye before spring vegetable planting; mature rye residues can temporarily tie up nitrogen."],c,["This tool does not infer germination temperatures from air forecasts."]);
    }
    if(c.month>=3&&c.month<=6&&crop.window==="late"){
-     return result("PLAN_FALL","Plan fall seeding or choose a spring cover crop","The main fall rye establishment window has not arrived.",["If growing an early vegetable crop, research spring cover crop alternatives before seeding.","Coordinate cover crop termination with spring planting."]);
+     return result("PLAN_FALL","Plan fall seeding or choose a spring cover crop","The main fall rye establishment window has not arrived.",["If growing an early vegetable crop, research spring cover crop alternatives before seeding.","Coordinate cover crop termination with spring planting."],c);
    }
    if(soil!==null&&soil<35){
      return result("CHECK_SOIL","Measured soil is very cold for germination","You reported an unusually low bed-temperature reading; cold soils slow or stop germination.",["Confirm the reading at seed depth and check species-specific local extension guidance.","Do not treat above-freezing AIR forecasts as proof the seedbed is warm enough."],c);
