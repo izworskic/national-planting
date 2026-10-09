@@ -19,9 +19,10 @@ t("frozen soil veto","soilReadiness",{crop:"peas",ground:"frozen",soil:"42"},"DO
 t("beans with imminent frost veto","soilReadiness",{crop:"beans",ground:"crumbly",soil:"68"},"FROST_RISK");
 t("peas 50 degree soil ready conditionally","soilReadiness",{crop:"peas",ground:"crumbly",soil:"50"},"READY_CONDITIONAL");
 t("dry soil needs moisture","soilReadiness",{crop:"cucumbers",ground:"dry",soil:"74"},"FIX_MOISTURE");
-t("seedling day zero starts in shade","hardeningOff",{day:"0",crop:"warm"},"START_SHADED");
-t("wind first sheltered","hardeningOff",{day:"5",crop:"warm",exposure:"wind"},"SHELTER_FIRST");
+t("seedling day zero starts in shade when no cold is forecast","hardeningOff",{day:"0",crop:"warm"},"START_SHADED",{...base,current_forecast:{updated_at:"2026-10-09T18:00:00-04:00",periods:[{time:"2026-10-09T23:00:00-04:00",temp_f:55,unit:"F"}]}});
+t("wind first sheltered when weather otherwise suitable","hardeningOff",{day:"5",crop:"warm",exposure:"wind"},"SHELTER_FIRST",{...base,current_forecast:{updated_at:"2026-10-09T18:00:00-04:00",periods:[{time:"2026-10-09T23:00:00-04:00",temp_f:55,unit:"F"}]}});
 t("frost forecast overrules exposed mid-stage seedlings","hardeningOff",{day:"5",crop:"warm",exposure:"partial"},"PROTECT_FROM_FROST");
+t("frost forecast overrules day zero","hardeningOff",{day:"0",crop:"warm",exposure:"shade"},"PROTECT_FROM_FROST");
 t("stale NWS does not imply safe overnight weather","hardeningOff",{day:"5",crop:"cool",exposure:"partial"},"VERIFY_LOCAL_FORECAST",base);
 for(const slug of ["prune-hydrangeas","soil-temperature-ready","harden-off-seedlings"]){
 test(slug+" is SEO indexable and uses compact 44px location forms",()=>{
