@@ -11,7 +11,8 @@ function garlic(i,f,date=new Date()){
  let code="CHECK",heading="Check your bed before planting",why=[];
  if(frozen){code="HOLD";heading="Ground frozen: do not plant cloves";why.push("Wait for workable soil; never force cloves into frozen ground.");}
  else if(c.month>=3&&c.month<=8){code="WAIT";heading="Plan for fall garlic planting";why.push("Prepare well-drained beds for the autumn root establishment period.");}
- else if(c.month<=2||(c.month===12&&c.zone!==null&&c.zone<8)){code="LATE";heading="Late for usual fall root establishment";why.push("Workable ground may permit planting, but late rooting can reduce bulb performance.");}
+ else if(c.month<=2){code=c.zone!==null&&c.zone>=8?"CHECK":"LATE";heading=c.zone!==null&&c.zone>=8?"Mild-winter garlic: check your local planting window":"Late for usual northern fall root establishment";why.push("Local chill availability and cultivar selection matter; a late planting can reduce bulb performance.");}
+ else if(c.month===12&&c.zone!==null&&c.zone<8){code="LATE";heading="Late for usual northern fall root establishment";why.push("Workable ground may permit planting, but late rooting can reduce bulb performance.");}
  else if(soil!==null&&soil>=70&&c.month<=10){code="WAIT";heading="Warm soil: reassess as autumn cools";why.push("Wait for cooler fall soil unless local extension guidance recommends planting now.");}
  else if(c.month===9&&soil===null){code="CHECK";heading="Check soil temperature and local autumn timing";why.push("September can be early; air temperatures cannot substitute for measured soil conditions.");}
  else {code=workable?"PLANT":"CHECK";heading=workable?"Plant garlic now while soil is workable":"Plant if your bed remains workable";why.push("Aim to establish roots before the ground freezes, approximately three weeks in many colder-region guidelines. This tool does not predict ground-freeze date.");}
@@ -28,11 +29,11 @@ function bulbs(i,f,date=new Date()){
  let code="CHECK",heading="Measure soil temperature at planting depth",why=[];
  if(frozen){code="HOLD";heading="Ground frozen: outdoor planting on hold";why.push("Do not force bulbs into frozen ground. Consider local guidance on containers, storage, or forcing.");}
  else if(c.month>=3&&c.month<=8){code="WAIT";heading="Fall is the usual spring-flowering bulb season";why.push("Spring bulb forcing is a different process from normal outdoor autumn planting.");}
- else if(soil!==null&&soil>60){code="WAIT";heading="Soil is too warm for routine bulb planting";why.push("Wait until soil cools to approximately 50–55°F or below, before ground freezing.");}
+ else if(soil!==null&&soil>55){code="WAIT";heading="Soil is too warm for routine bulb planting";why.push("Wait until soil cools to approximately 50–55°F or below, before ground freezing.");}
  else if(soil!==null){code=workable?"PLANT":"CHECK";heading=workable?"Plant while cool ground is workable":"Cool soil: confirm the ground is workable";why.push("Measured soil is cool enough; the full planting depth must remain workable.");}
  else if(workable&&[11,12,1,2].includes(c.month)){code="CHECK";heading="Bed workable: confirm soil temperature and plant promptly";why.push("Air frosts do not establish whether your soil is in the preferred bulb planting range.");}
  else {code="CHECK";heading="Measure soil before planting";why.push("University of Wisconsin Extension recommends approximately 50–55°F soil, before ground freezing.");}
- if(!frozen&&c.zone!==null&&c.zone>=8&&(type==="tulip"||type==="hyacinth")&&i.chilling!=="yes"){
+ if(!frozen&&[9,10,11,12,1,2].includes(c.month)&&code!=="WAIT"&&c.zone!==null&&c.zone>=8&&(type==="tulip"||type==="hyacinth")&&i.chilling!=="yes"){
   code="CHILL";heading="Review bulb prechilling requirements first";why.unshift("Mild winters can lack enough chilling for reliable "+type+" flowers. Confirm the specific cultivar's prechilling requirement with the supplier.");
  }
  if(c.zone!==null&&c.zone>=8)why.push("In mild climates, spring bulb performance depends on species, cultivar and available winter chill.");
