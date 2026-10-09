@@ -1,0 +1,14 @@
+const test=require("node:test"),assert=require("node:assert/strict"),e=require("../public/national-tools/planting/_assets/garden-autumn-engine.js");
+const data=z=>({location:{timeZone:"America/New_York"},hardiness_zone:{zone:z},climate_normals:{dates:{fall_50:{mmdd:"10-10"}}}});
+const date=new Date("2026-10-09T20:00:00Z");
+test("garlic frozen veto",()=>assert.equal(e.garlic({workable:"frozen",soil:50},data("6a"),date).code,"HOLD"));
+test("garlic viable fall soil",()=>assert.equal(e.garlic({workable:"workable",soil:53},data("6a"),date).code,"PLANT"));
+test("garlic summer waits",()=>assert.equal(e.garlic({workable:"workable",soil:55},data("6a"),new Date("2026-06-09T20:00:00Z")).code,"WAIT"));
+test("bulbs frozen veto even in mild zone",()=>assert.equal(e.bulbs({workable:"frozen",soil:52,type:"tulip",chilling:"unknown"},data("9a"),date).code,"HOLD"));
+test("bulbs warm soil waits",()=>assert.equal(e.bulbs({workable:"workable",soil:67,type:"daffodil"},data("6a"),date).code,"WAIT"));
+test("bulbs cool planted",()=>assert.equal(e.bulbs({workable:"workable",soil:52,type:"daffodil"},data("6a"),date).code,"PLANT"));
+test("warm tulip without chill gated",()=>assert.equal(e.bulbs({workable:"workable",soil:52,type:"tulip",chilling:"unknown"},data("9a"),date).code,"CHILL"));
+test("unknown soil does not become observed",()=>assert.equal(e.bulbs({workable:"unknown",soil:"",type:"tulip"},data("6a"),date).soilMeasured,false));
+
+test("bulbs spring season wins over chilling review",()=>assert.equal(e.bulbs({workable:"workable",soil:53,type:"tulip",chilling:"unknown"},data("9a"),new Date("2027-04-09T20:00:00Z")).code,"WAIT"));
+test("bulbs excessively warm soil wins over chilling review",()=>assert.equal(e.bulbs({workable:"workable",soil:61,type:"tulip",chilling:"unknown"},data("9a"),date).code,"WAIT"));
