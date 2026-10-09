@@ -119,15 +119,16 @@
    if(!warmRegion&&crop.window==="mid"&&((days!==null&&days<=14&&c.month>=8)||c.month>=12)){
      return result("LATE_FOR_SPECIES","Limited establishment time for "+crop.name,"A very late fall seeding can germinate without building useful fall growth.",["Winter rye is generally the more reliable late-fall alternative.","A legume's spring nitrogen benefit cannot be assumed from an insufficient fall stand."],c);
    }
+   if(soil!==null&&soil<35){
+     return result("CHECK_SOIL","Measured soil is very cold for germination","You reported an unusually low bed-temperature reading; cold soils slow or stop germination.",["Confirm the reading at seed depth and check species-specific local extension guidance.","Do not treat above-freezing AIR forecasts as proof the seedbed is warm enough."],c);
+   }
    if(crop.window==="late"&&c.month>=10&&c.month<=12&&ground==="workable"){
      return result("POSSIBLE","Winter rye may still be possible","Winter rye is among the latest-planted reliable fall cover crops, but late sowing yields less fall biomass.",["Sow into a prepared, workable bed with seed-to-soil contact and adequate moisture.","Plan to terminate the rye before spring vegetable planting; mature rye residues can temporarily tie up nitrogen."],c,["This tool does not infer germination temperatures from air forecasts."]);
    }
    if(c.month>=3&&c.month<=6&&crop.window==="late"){
      return result("PLAN_FALL","Plan fall seeding or choose a spring cover crop","The main fall rye establishment window has not arrived.",["If growing an early vegetable crop, research spring cover crop alternatives before seeding.","Coordinate cover crop termination with spring planting."],c);
    }
-   if(soil!==null&&soil<35){
-     return result("CHECK_SOIL","Measured soil is very cold for germination","You reported an unusually low bed-temperature reading; cold soils slow or stop germination.",["Confirm the reading at seed depth and check species-specific local extension guidance.","Do not treat above-freezing AIR forecasts as proof the seedbed is warm enough."],c);
-   }
+
    const actions=[
      "Seed into a weed-free, prepared bed while soil is workable and moisture is available.",
      crop.winter==="winterkills"?"This species is often winterkilled in cold climates; meaningful fall growth is needed to deliver benefits.":"If it survives winter, plan spring termination so it does not compete with the next crop."

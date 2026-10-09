@@ -38,3 +38,5 @@ for(const slug of ["tomato-ripening","dig-dahlias","cover-crops"]){
   assert.doesNotMatch(html,/<title>\s*<\/title>/);
  });
 }
+
+test("cold measured seedbed overrides late rye",()=>assert.equal(D.coverCrop({species:"rye",bed:"clear",ground:"workable",soil:30},climate(),at).code,"CHECK_SOIL"));
