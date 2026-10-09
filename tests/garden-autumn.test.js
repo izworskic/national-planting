@@ -9,3 +9,6 @@ test("bulbs warm soil waits",()=>assert.equal(e.bulbs({workable:"workable",soil:
 test("bulbs cool planted",()=>assert.equal(e.bulbs({workable:"workable",soil:52,type:"daffodil"},data("6a"),date).code,"PLANT"));
 test("warm tulip without chill gated",()=>assert.equal(e.bulbs({workable:"workable",soil:52,type:"tulip",chilling:"unknown"},data("9a"),date).code,"CHILL"));
 test("unknown soil does not become observed",()=>assert.equal(e.bulbs({workable:"unknown",soil:"",type:"tulip"},data("6a"),date).soilMeasured,false));
+
+test("bulbs spring season wins over chilling review",()=>assert.equal(e.bulbs({workable:"workable",soil:53,type:"tulip",chilling:"unknown"},data("9a"),new Date("2027-04-09T20:00:00Z")).code,"WAIT"));
+test("bulbs excessively warm soil wins over chilling review",()=>assert.equal(e.bulbs({workable:"workable",soil:61,type:"tulip",chilling:"unknown"},data("9a"),date).code,"WAIT"));
