@@ -83,6 +83,44 @@
     return { offset: gaps.reduce((s, x) => s + x, 0) / gaps.length, days: pairs.length };
   }
 
+  /** Albers equal-area conic for the lower 48 (parallels 29.5 and 45.5, origin 37.5N 96W), scaled by the
+   * k/tx/ty in _data/us-map.json, so station points land on the outline drawn from the same projection. */
+  function project(lat, lon, m) {
+    const r = Math.PI / 180, p1 = 29.5 * r, p2 = 45.5 * r, p0 = 37.5 * r, l0 = -96 * r;
+    const n = (Math.sin(p1) + Math.sin(p2)) / 2, C = Math.cos(p1) ** 2 + 2 * n * Math.sin(p1), rho0 = Math.sqrt(C - 2 * n * Math.sin(p0)) / n;
+    const rho = Math.sqrt(C - 2 * n * Math.sin(lat * r)) / n, th = n * (lon * r - l0);
+    return [rho * Math.sin(th) * m.k + m.tx, m.ty - (rho0 - rho * Math.cos(th)) * m.k];
+  }
+  /** USCRN daily01 "updates" file (every station, one day): -> Map(stationKeyPrefix WBAN -> {iso, t}). */
+  function fromCRNDay(text) {
+    const out = new Map();
+    for (const line of String(text || '').split('\n')) {
+      const c = line.trim().split(/\s+/); if (c.length < 28 || !/^\d{8}$/.test(c[1])) continue;
+      const t = Number(c[23]);
+      if (Number.isFinite(t) && t > -99) out.set(c[0], { iso: c[1].slice(0, 4) + '-' + c[1].slice(4, 6) + '-' + c[1].slice(6, 8), t: Math.round((t * 9 / 5 + 32) * 10) / 10, lat: Number(c[4]), lon: Number(c[3]) });
+    }
+    return out;
+  }
+  /** AWDB response for many stations -> Map(triplet -> latest {iso, t}). */
+  function latestAWDB(json) {
+    const out = new Map();
+    for (const st of Array.isArray(json) ? json : []) {
+      const vals = st && st.data && st.data[0] && st.data[0].values; if (!vals) continue;
+      for (let i = vals.length - 1; i >= 0; i--) { const t = num(vals[i].value); if (t !== null) { out.set(st.stationTriplet, { iso: String(vals[i].date).slice(0, 10), t }); break; } }
+    }
+    return out;
+  }
+  /** Map colour bands, tied to the crop minimums. */
+  const BANDS = [
+    { max: 35, label: 'Below 35°F', note: 'too cold to sow', color: '#3b5b92' },
+    { max: 40, label: '35 to 39°F', note: 'lettuce, spinach', color: '#7aa6cf' },
+    { max: 50, label: '40 to 49°F', note: 'peas, radishes, carrots, beets', color: '#a9cf9a' },
+    { max: 60, label: '50 to 59°F', note: 'sweet corn', color: '#efc350' },
+    { max: 70, label: '60 to 69°F', note: 'beans, squash, cucumbers, melons', color: '#e07b39' },
+    { max: Infinity, label: '70°F and up', note: 'warm-season seed', color: '#a8382a' }
+  ];
+  const band = t => BANDS.find(b => t < b.max);
+
   // ---------- the rule ----------
   /** First day from which every later day in the series is warm (gaps skipped), with at least 3 such days. */
   function settled(series, t) {
@@ -141,5 +179,5 @@
     return out;
   }
 
-  return { FORECAST_DAYS, BIAS_DAYS, WARN_MILES, STATION_MILES, TRUST_GAP, THRESHOLDS, miles, nearest, fromAWDB, fromCRN, fromModel, bias, settled, outlook, outlookWords, assess, addDays, diffDays, fmt, dayOf, dayText, when, warm };
+  return { project, fromCRNDay, latestAWDB, BANDS, band, FORECAST_DAYS, BIAS_DAYS, WARN_MILES, STATION_MILES, TRUST_GAP, THRESHOLDS, miles, nearest, fromAWDB, fromCRN, fromModel, bias, settled, outlook, outlookWords, assess, addDays, diffDays, fmt, dayOf, dayText, when, warm };
 });
