@@ -51,6 +51,7 @@
  }
  async function choose(place){
    loc=place;feed=null;const current=++request;
+   try{document.dispatchEvent(new CustomEvent("garden:place",{detail:place}));}catch(_){}
    controls.hidden=false;output.hidden=true;observed.hidden=true;
    status.textContent="Checking NOAA / NWS conditions for "+N.label(place)+"…";
    try{
