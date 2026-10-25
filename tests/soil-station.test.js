@@ -80,3 +80,23 @@ test('page: query-first title, national scope, and Michigan visitors handed to t
   assert.match(page, /stateCode[^\n]*=== 'MI'/);
   assert.match(fs.readFileSync(path.join(ROOT, 'public/national-tools/planting/_assets/garden-fall-decisions-page.js'), 'utf8'), /garden:place/);
 });
+
+test('soil temperature map: projection, bulk feeds, colour bands and page section', () => {
+  const m = JSON.parse(fs.readFileSync(path.join(ROOT, 'public/national-tools/planting/_data/us-map.json'), 'utf8'));
+  assert.match(m.source, /Census/); assert.ok(m.outline.length > 1000 && m.borders.length > 1000);
+  // Corners of the lower 48 land inside the frame, in the right order.
+  const [sx, sy] = S.project(47.6, -122.3, m), [mx, my] = S.project(25.8, -80.2, m), [bx, by] = S.project(44.8, -68.8, m), [kx, ky] = S.project(37.7, -97.3, m);
+  for (const [x, y] of [[sx, sy], [mx, my], [bx, by], [kx, ky]]) assert.ok(x > 0 && x < m.W && y > 0 && y < m.H);
+  assert.ok(sx < kx && kx < mx && kx < bx && sy < ky && ky < my);
+  const awdb = [{ stationTriplet: '1:KS:SCAN', data: [{ values: [{ date: '2026-10-23', value: 60 }, { date: '2026-10-24', value: null }] }] }, { stationTriplet: '2:KS:SCAN', data: [] }];
+  assert.deepEqual([...S.latestAWDB(awdb)], [['1:KS:SCAN', { iso: '2026-10-23', t: 60 }]]);
+  const day = S.fromCRNDay('53182 20261024  2.622  -102.81   31.62    15.0    -1.5     6.8     6.2     0.0    12.52 C    18.6    -3.6     4.9    87.4    24.9    57.3   0.207   0.204   0.190   0.072   0.330    22.9     9.0     9.0    10.5    11.3');
+  assert.deepEqual(day.get('53182'), { iso: '2026-10-24', t: 73.2, lat: 31.62, lon: -102.81 });
+  assert.equal(S.band(34.9).label, 'Below 35°F'); assert.equal(S.band(35).label, '35 to 39°F'); assert.equal(S.band(60).label, '60 to 69°F'); assert.equal(S.band(70).label, '70°F and up');
+  for (const c of Object.values(G.seeds)) assert.ok(S.BANDS.some(b => b.max === c.minimum), c.name + ' minimum is a band edge');
+  assert.match(PAGE, /<h2 id="sm-head">Soil temperature map<\/h2>/);
+  assert.match(PAGE, /id="sm-status" role="status"/);
+  assert.match(PAGE, /<svg id="sm-map" role="img" aria-labelledby="sm-head sm-status">/);
+  assert.match(PAGE, /<tbody id="sm-rows">/, 'a list alternative to the map');
+  assert.match(PAGE, /soil-map-page\.js/);
+});

@@ -56,3 +56,12 @@ The national copy (title, description, H1, lede) never mentions Michigan; a test
 - SCAN's daily value and USCRN's daily average are both daily means but are computed differently; neither is the morning low a gardener's thermometer reads.
 - Lower 48 only. Alaska, Hawaii and Puerto Rico get the model, unadjusted.
 - A station map ("soil temperature map") is the next step and is not in this change.
+
+## Soil temperature map (added October 25, 2026)
+
+The page now opens, before any ZIP is entered, with a map of the latest daily soil temperature at every station in the index, for "soil temperature map" searches (the second most common autocomplete phrasing after the bare term).
+
+- **Feeds, two requests in all:** AWDB REST for every SCAN station at once (`stationTriplets=*:*:SCAN`, STO -2 in, last 4 days, about 130 KB), and USCRN's all-station daily file (`daily01/updates/YYYY/CRND0103-YYYYMMDD2359.txt`, about 34 KB, posted the next morning; the page falls back up to two days). USCRN rows are matched to stations by coordinates. Checked against the real feeds on October 25: 183 of 192 SCAN and 111 of 127 USCRN stations had a reading within 4 days. Readings older than 4 days are left off. Cached in the browser for an hour.
+- **Outline:** Census cartographic boundaries via us-atlas 3.0.1 (ISC), projected once by `scripts/build-us-map.mjs` with the same Albers projection as `SoilStation.project()`; 46 KB.
+- **Colours** are bands whose edges are the crop minimums (35, 40, 50, 60°F, plus 70°F), named in the legend with the crops and a count, so colour never carries the meaning alone. A list of every reading sits under the map for keyboard and screen-reader use, and a tap anywhere picks the nearest station.
+- Michigan has only two federal stations, so the map's note points Michigan gardeners to the MSU-based Michigan tool.
