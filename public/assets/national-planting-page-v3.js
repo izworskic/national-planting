@@ -73,6 +73,33 @@ document.addEventListener("DOMContentLoaded",function(){
   function renderAssumptions(){const root=byId("assumption-note");if(!root)return;const c=plan.context,notes=[];if(c.protectionMode==="row-cover")notes.push("Row-cover mode gives cool crops a conservative 7-day shoulder-season planning extension; real protection varies by fabric, wind, cloud cover and soil heat.");if(c.protectionMode==="low-tunnel")notes.push("Low-tunnel/cold-frame mode gives cool crops a conservative 14-day planning extension; vent on warm sunny days and monitor temperatures.");if(c.temporaryShade)notes.push("Temporary-shade mode can help establishment in heat, but the NWS forecast shown above remains the actual outside-air forecast.");if(c.soilTempF!=null)notes.push("Measured soil temperature: "+c.soilTempF+"°F. This directly gates seed germination recommendations where crop data support it.");root.innerHTML=notes.length?"<strong>Active assumptions:</strong> "+esc(notes.join(" ")):"<strong>Active assumptions:</strong> open garden, no temporary shade, no measured soil-temperature override."}
   function rebuild(){if(!cropData||!model||!locData)return;plan=E.build(cropData.crops,context());renderSignals();renderAssumptions();renderPacket();renderNow();renderHorizon();renderTable()}
 
+  // Versioned same-origin contract: Michigan guidance augments the national weather model.
+  // Never apply Michigan station data to another state, and do not reuse stale location responses.
+  let michiganRequest=0;
+  async function loadMichiganGuidance(loc){
+    const root=byId("mi-shared"), ticket=++michiganRequest;
+    if(!root)return;
+    root.replaceChildren();
+    if(loc.stateCode!=="MI")return;
+    const place=(/^\d{5}$/.test(String(loc.postcode||""))?loc.postcode:loc.place)||"";
+    if(!place){root.textContent="Michigan station guidance is unavailable for this location.";return;}
+    root.textContent="Checking Michigan garden guidance…";
+    try{
+      const response=await fetch("/api/michigan-garden-plan-v1?place="+encodeURIComponent(place));
+      if(!response.ok)throw new Error("unavailable");
+      const data=await response.json();
+      if(ticket!==michiganRequest)return;
+      if(data.version!=="1.0"||!Array.isArray(data.crops)||!data.station)throw new Error("invalid contract");
+      const heading=document.createElement("strong");heading.textContent="Michigan garden guidance · "+data.station;
+      const intro=document.createElement("p");intro.textContent="These are source-qualified Michigan garden notes. The national weather and season model above uses a different set of inputs, so check the details when answers differ.";
+      const list=document.createElement("ul");
+      const order={PLAN_GARLIC:0,PLAN_FALL:1,START_INDOORS:2,HARDEN_OFF:3,READY_WHEN:4,WAIT_SOIL:5,GUIDE:6};
+      data.crops.filter(c=>Object.hasOwn(order,c.code)).sort((a,b)=>order[a.code]-order[b.code]).slice(0,3).forEach(c=>{const li=document.createElement("li"),b=document.createElement("b");b.textContent=c.name+": ";li.append(b,document.createTextNode(c.detail));list.append(li)});
+      const note=document.createElement("p");note.textContent=data.limitation||"Historical dates are planning references; check your garden and forecast.";
+      root.replaceChildren(heading,intro,list,note);
+    }catch(error){if(ticket===michiganRequest)root.textContent="Michigan station guidance is unavailable right now; the national plan remains available."}
+  }
+
   async function run(loc){
     const status=document.querySelector(".status"),responses=await Promise.all([fetch("/api/national-frost?lat="+encodeURIComponent(loc.latitude)+"&lon="+encodeURIComponent(loc.longitude)+(loc.postcode?"&zip="+encodeURIComponent(loc.postcode):"")),fetch("/data/national-planting-crops.json"),fetch("/data/national-planting-v3.json?v=20260903")]),fr=responses[0],cr=responses[1],vr=responses[2];let x=null;try{x=await fr.json()}catch(_){throw new Error("Planting climate data unavailable · HTTP "+fr.status)}
     if(!fr.ok)throw new Error(x?.error||"Planting climate data unavailable");if(!cr.ok||!vr.ok)throw new Error("Crop timing data unavailable");
@@ -83,7 +110,7 @@ document.addEventListener("DOMContentLoaded",function(){
     const freeze=byId("freeze-pill");if(freeze){freeze.textContent=x.freeze_verdict?.label||"Live cold forecast unavailable";freeze.className="pill "+((x.freeze_verdict?.level==="freeze"||x.freeze_verdict?.level==="hard-freeze")?"danger":"")}
     plan=E.build(cropData.crops,context());if(byId("mode-pill"))byId("mode-pill").textContent=plan.mode==="heat-limited"?"Heat-limited calendar":plan.mode==="long-season"?"Long-season calendar":"Frost-limited calendar";
     if(byId("season-note"))byId("season-note").innerHTML=plan.mode==="heat-limited"?"<strong>Different rhythm here:</strong> cool crops belong mainly in the cooler months; heat is often the limiting factor, not a northern-style first/last-frost calendar.":plan.mode==="long-season"?"<strong>Long season:</strong> this climate can support two strong cool-season shoulders around the warm season. The tool uses current heat plus crop biology instead of treating the first 32°F date as a universal stop.":"<strong>Frost-limited season:</strong> late crops are evaluated against a crop-specific cold deadline, fall slowdown and safety time. Hardy crops are not automatically stopped at the first 32°F event.";
-    if(byId("mi"))byId("mi").hidden=loc.stateCode!=="MI";rebuild();if(status)status.textContent="";byId("result")?.scrollIntoView({behavior:"smooth",block:"start"});
+    if(byId("mi"))byId("mi").hidden=loc.stateCode!=="MI";loadMichiganGuidance(loc);rebuild();if(status)status.textContent="";byId("result")?.scrollIntoView({behavior:"smooth",block:"start"});
   }
 
   const status=document.querySelector(".status");
