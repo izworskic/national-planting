@@ -13,3 +13,13 @@ test('failed or incompatible contracts fail gracefully and stale responses do no
  let resolve;const x=setup(()=>new Promise(r=>{resolve=r}));const first=x.load({stateCode:'MI',postcode:'48706'});await x.load({stateCode:'WI',postcode:'53703'});resolve({ok:true,json:async()=>({version:'1.0',station:'Bay City',crops:[]})});await first;assert.equal(x.root.children.length,0);
  const y=setup(async()=>({ok:true,json:async()=>({version:'2.0',station:'Bay City',crops:[]})}));await y.load({stateCode:'MI',place:'Bay City'});assert.match(y.root.textContent,/unavailable/);
 });
+
+
+test('national engine does not invent a Michigan garlic deadline from first frost',()=>{
+ const E=require('../public/assets/national-planting-engine.js');
+ const crop={id:'garlic',name:'Garlic',calendar_rule:'garlic',sow_methods:['direct'],season:'cool'};
+ const ctx={today:new Date('2026-10-10T12:00:00'),springAnchor:new Date('2026-05-02T12:00:00'),fallAnchor:new Date('2026-10-03T12:00:00'),stateCode:'MI'};
+ const result=E.evaluateMethod(crop,'direct',ctx);assert.equal(result.state,'regional');assert.equal(result.latest,null);assert.match(result.reason,/hard freeze/);
+ assert.equal(E.horizonEvents([crop],ctx,42).events.length,0);
+ const elsewhere=E.garlicWindow(crop,{...ctx,stateCode:'WI'});assert.ok(elsewhere.start&&elsewhere.end);
+});
