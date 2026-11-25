@@ -10,8 +10,17 @@ on:
       - 'public/data/national-planting*.json'
       - 'scripts/browser-smoke-production.mjs'
       - '.github/workflows/browser-smoke-production.yml'
+  # Test changes to the monitor itself against the already deployed product.
+  # Product changes still run the canonical production check after deployment.
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/browser-smoke-production.mjs'
+      - '.github/workflows/browser-smoke-production.yml'
   schedule:
     - cron: '23 11 * * *'
+permissions:
+  contents: read
 jobs:
   smoke:
     runs-on: ubuntu-24.04
