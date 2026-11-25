@@ -1,6 +1,12 @@
 name: Browser smoke production
 on:
   workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/browser-smoke-production.mjs'
+      - 'scripts/planting-smoke-contract.mjs'
+      - '.github/workflows/browser-smoke-production.yml'
   push:
     branches:
       - main
@@ -9,6 +15,7 @@ on:
       - 'public/assets/national-planting-*.js'
       - 'public/data/national-planting*.json'
       - 'scripts/browser-smoke-production.mjs'
+      - 'scripts/planting-smoke-contract.mjs'
       - '.github/workflows/browser-smoke-production.yml'
   schedule:
     - cron: '23 11 * * *'
