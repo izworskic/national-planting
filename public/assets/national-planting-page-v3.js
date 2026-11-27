@@ -75,7 +75,8 @@ document.addEventListener("DOMContentLoaded",function(){
 
   // Versioned same-origin contract: Michigan guidance augments the national weather model.
   // Never apply Michigan station data to another state, and do not reuse stale location responses.
-  let michiganRequest=0,decisionGeneration=0;
+  let michiganRequest=0;
+  let decisionGeneration=0;
   function invalidateDecision(){
     decisionGeneration++;michiganRequest++;
     model=null;locData=null;plan=null;
