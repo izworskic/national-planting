@@ -75,7 +75,13 @@ document.addEventListener("DOMContentLoaded",function(){
 
   // Versioned same-origin contract: Michigan guidance augments the national weather model.
   // Never apply Michigan station data to another state, and do not reuse stale location responses.
-  let michiganRequest=0;
+  let michiganRequest=0,decisionGeneration=0;
+  function invalidateDecision(){
+    decisionGeneration++;michiganRequest++;
+    model=null;locData=null;plan=null;
+    if(byId("result"))byId("result").hidden=true;
+    if(byId("mi-shared"))byId("mi-shared").replaceChildren();
+  }
   async function loadMichiganGuidance(loc){
     const root=byId("mi-shared"), ticket=++michiganRequest;
     if(!root)return;
@@ -101,22 +107,26 @@ document.addEventListener("DOMContentLoaded",function(){
   }
 
   async function run(loc){
+    invalidateDecision();const ticket=decisionGeneration;
     const status=document.querySelector(".status"),responses=await Promise.all([fetch("/api/national-frost?lat="+encodeURIComponent(loc.latitude)+"&lon="+encodeURIComponent(loc.longitude)+(loc.postcode?"&zip="+encodeURIComponent(loc.postcode):"")),fetch("/data/national-planting-crops.json"),fetch("/data/national-planting-v3.json?v=20260903")]),fr=responses[0],cr=responses[1],vr=responses[2];let x=null;try{x=await fr.json()}catch(_){throw new Error("Planting climate data unavailable · HTTP "+fr.status)}
     if(!fr.ok)throw new Error(x?.error||"Planting climate data unavailable");if(!cr.ok||!vr.ok)throw new Error("Crop timing data unavailable");
-    const baseData=await cr.json(),v3Data=await vr.json();cropData=mergeCropData(baseData,v3Data);model=x;locData=loc;populatePacketCrops();
+    const baseData=await cr.json(),v3Data=await vr.json();if(ticket!==decisionGeneration)return;
     const c=x.climate_normals||{},a=climateAnchors(c);if(!a.spring&&!a.fall&&!x.current_forecast)throw new Error("A usable climate or forecast signal was not found near this location.");
-    if(byId("result"))byId("result").hidden=false;if(byId("answer"))byId("answer").textContent="Planting window near "+N.label(loc);
+    cropData=mergeCropData(baseData,v3Data);model=x;locData=loc;populatePacketCrops();
+    if(byId("answer"))byId("answer").textContent="Planting window near "+N.label(loc);
     const parts=[];if(a.spring)parts.push((a.rolledSpring?"next spring anchor ":"spring anchor ")+fmt(a.spring)+" ("+a.springLabel+")");if(a.fall)parts.push("fall anchor "+fmt(a.fall)+" ("+a.fallLabel+")");if(c.name)parts.push("NOAA station "+c.name+(c.distance_miles==null?"":" · "+c.distance_miles.toFixed(1)+" mi"));if(c.confidence)parts.push("station fit "+c.confidence);if(byId("base"))byId("base").textContent=parts.join(" · ")+(parts.length?". ":"")+"These are probability anchors, not guaranteed frost dates.";
     const freeze=byId("freeze-pill");if(freeze){freeze.textContent=x.freeze_verdict?.label||"Live cold forecast unavailable";freeze.className="pill "+((x.freeze_verdict?.level==="freeze"||x.freeze_verdict?.level==="hard-freeze")?"danger":"")}
     plan=E.build(cropData.crops,context());if(byId("mode-pill"))byId("mode-pill").textContent=plan.mode==="heat-limited"?"Heat-limited calendar":plan.mode==="long-season"?"Long-season calendar":"Frost-limited calendar";
     if(byId("season-note"))byId("season-note").innerHTML=plan.mode==="heat-limited"?"<strong>Different rhythm here:</strong> cool crops belong mainly in the cooler months; heat is often the limiting factor, not a northern-style first/last-frost calendar.":plan.mode==="long-season"?"<strong>Long season:</strong> this climate can support two strong cool-season shoulders around the warm season. The tool uses current heat plus crop biology instead of treating the first 32°F date as a universal stop.":"<strong>Frost-limited season:</strong> late crops are evaluated against a crop-specific cold deadline, fall slowdown and safety time. Hardy crops are not automatically stopped at the first 32°F event.";
-    if(byId("mi"))byId("mi").hidden=loc.stateCode!=="MI";loadMichiganGuidance(loc);rebuild();if(status)status.textContent="";byId("result")?.scrollIntoView({behavior:"smooth",block:"start"});
+    if(byId("mi"))byId("mi").hidden=loc.stateCode!=="MI";loadMichiganGuidance(loc);rebuild();if(byId("result"))byId("result").hidden=false;if(status)status.textContent="";byId("result")?.scrollIntoView({behavior:"smooth",block:"start"});
   }
 
   const status=document.querySelector(".status");
   if(!E||!S||!form){if(status)status.innerHTML='<span class="error">The planting tool did not finish loading. Refresh the page and try again.</span>';return}
 
   // Bind the location form before optional feature controls so a stale/mixed HTML shell can never disable ZIP lookup.
+  form.addEventListener("submit",invalidateDecision,true);
+  form.parentElement.addEventListener("click",e=>{if(e.target.closest("[data-use-location],[data-place-switch]"))invalidateDecision();},true);
   N.bind(form,run);
 
   if(packetCrop)packetCrop.addEventListener("change",()=>{const c=cropData?.crops.find(x=>x.id===packetCrop.value);if(c){if(packetDays)packetDays.value=c.maturity_days?.default||"";populatePacketMethods(c,preferredPacketMethod(c))}else{if(packetDays)packetDays.value="";populatePacketMethods(null)}renderPacket()});
